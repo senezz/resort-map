@@ -12,6 +12,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+MAP_PATH="$(cd "$SCRIPT_DIR" && cd "$(dirname "$MAP_PATH")" && pwd)/$(basename "$MAP_PATH")"
+BOOKINGS_PATH="$(cd "$SCRIPT_DIR" && cd "$(dirname "$BOOKINGS_PATH")" && pwd)/$(basename "$BOOKINGS_PATH")"
+
 export MAP_PATH
 export BOOKINGS_PATH
 

@@ -37,7 +37,22 @@ Verified end-to-end: `./run.sh` starts both backend (port 3001) and frontend (po
 
 ### Stage 1 — Backend: map parser and GET /api/map
 
-<to be filled>
+Split the backend into small files:
+
+`types.ts` — Tile, Cabana, MapData types
+`services/mapLoader.ts` — parses ASCII into data, plus a helper to read the file
+`routes/map.ts` — Express router with GET /map
+`index.ts` — reads env vars, loads the map, starts the server
+
+Kept the parser as a pure function so I can test it with just a string later,
+no need to touch the file system. For the router I used a factory that takes mapData as an argument. This way I
+can pass fake data in tests instead of mocking file reads. Asked Claude Code to split lines with `/\r?\n/` instead of `\n` so Windows line
+endings don't mess things up. First run crashed with `ENOENT: map.ascii not found`. The path in the error
+pointed to `backend/map.ascii`, but the file is at the project root. Turns out `npm run --workspace=backend` changes the working directory into
+`backend/` before running the command. So the relative path was being resolved
+from the wrong place. Fixed it in `run.sh` — turned MAP_PATH and BOOKINGS_PATH into absolute paths
+before exporting them. After that it didn't matter where the backend started
+from.
 
 ### Stage 2 — Backend: POST /api/bookings
 
