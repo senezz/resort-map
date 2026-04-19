@@ -132,7 +132,32 @@ happy path clean.
 
 ### Stage 5 — Frontend: booking flow
 
-<to be filled>
+Built a single BookingDialog component that handles both cases:
+If the cabana is free shows a form with room + guest name, submits to the API, keeps the modal open on error so the user can fix and retry.
+If the cabana is already booked shows who booked it, with a Close button.
+
+One component for both views because the content is simple and the behavior
+(close on overlay / button) is the same. Two separate components would
+duplicate the wrapper and styling.
+
+The modal doesn't know about the map. `ResortMap` owns `selectedCabana` the modal only gets the cabana object and two callbacks (`onClose`,
+`onBooked`). Clicks on cabana tiles set the state; the modal reads it.
+Kept it as a single useState in ResortMap rather than lifting further or
+using context one component needs this, no one else does.
+After a successful booking I refetch GET /api/map instead of patching
+local state. Simpler and guarantees the UI matches the backend. For a
+small map the refetch cost is nothing.
+Extracted the fetch logic out of useEffect into a named `loadMap` function
+so it can be called both on mount and after a successful booking.
+
+MapTile takes an optional `onClick`. ResortMap passes a handler only for
+cabana tiles non-cabana tiles get `undefined` and stay non-interactive.
+One MapTile component, conditional behavior driven by the parent.
+
+Also tested manually Booked a cabana - modal closed, refetched map. Clicked same cabana again
+
+- modal showed the booked-by info. Wrong guest name - modal showed the
+  error from the server and stayed open. Cancel closed without booking.
 
 ### Stage 6 — Frontend: visual distinction for booked cabanas
 
