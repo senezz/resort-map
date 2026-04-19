@@ -56,7 +56,30 @@ from.
 
 ### Stage 2 — Backend: POST /api/bookings
 
-<to be filled>
+Added three new files:
+
+`services/guestStore.ts` — loads guests from bookings.json, checks if
+a (room, guestName) pair matches a real guest
+`services/bookingStore.ts` — keeps track of which cabanas are booked.
+Uses a Map inside a closure so the state is truly private.
+`routes/bookings.ts` — POST /bookings handler
+Also updated `routes/map.ts` to merge booking state into the cabana list
+before sending the response.
+
+Kept the map data and the booking state separate. The map is loaded once
+and never changes. Bookings are mutable runtime state, stored in the
+booking store. When GET /api/map is called, the route merges them into
+one response. One source of truth for each kind of data.
+
+Used guard clauses — four checks in a row, each with an early return:
+400(Missing or wrong-type fields);
+404(Cabana not found on the map);
+401(Guest credentials don't match);
+409(Cabana already booked)
+The happy path sits at the bottom. No try/catch, no nested ifs. Reads
+like a checklist.
+
+Also tested all of it with curl so successful booking returns 201 with the updated cabana,GET /api/map after booking shows `booked: true` with `bookedBy` and all four error paths return the correct HTTP codes
 
 ### Stage 3 — Backend tests
 
