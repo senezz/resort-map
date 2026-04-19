@@ -58,11 +58,11 @@ from.
 
 Added three new files:
 
-`services/guestStore.ts` — loads guests from bookings.json, checks if
+`services/guestStore.ts` loads guests from bookings.json, checks if
 a (room, guestName) pair matches a real guest
-`services/bookingStore.ts` — keeps track of which cabanas are booked.
+`services/bookingStore.ts` keeps track of which cabanas are booked.
 Uses a Map inside a closure so the state is truly private.
-`routes/bookings.ts` — POST /bookings handler
+`routes/bookings.ts` POST /bookings handler
 Also updated `routes/map.ts` to merge booking state into the cabana list
 before sending the response.
 
@@ -83,7 +83,27 @@ Also tested all of it with curl so successful booking returns 201 with the updat
 
 ### Stage 3 — Backend tests
 
-<to be filled>
+Before writing tests, split `index.ts` into two files:
+
+`app.ts` builds and returns the Express app
+`index.ts` — reads env vars, loads data, creates stores, calls `createApp`,
+and starts listen()
+This way tests can import the app without triggering a real listen() on a port.
+
+Wrote three test files:
+`mapLoader.test.ts` tests the pure parser. Small hand-written maps
+(3×2, 3×3) are easier to reason about than the real map.ascii.
+`bookingStore.test.ts` fresh store is empty, booking works, double
+booking throws, multiple bookings coexist.
+`app.test.ts` full integration via supertest. Covers GET /api/map,
+POST /api/bookings happy path, all four error codes (400/401/404/409),
+and that GET reflects bookings after POST.
+
+For integration tests, `mapData` and `guests` are built once at the top —
+they don't change. But `bookingStore` is created fresh in `createTestApp()`
+for each test, so state doesn't leak between tests.
+
+All tests pass on first run with `npm test` from the backend folder.
 
 ### Stage 4 — Frontend: render map from API
 
