@@ -167,8 +167,46 @@ Free cabanas stay as the default monochrome drawing.
 
 ### Stage 7 — Frontend tests
 
-<to be filled>
+Wrote one test file: `ResortMap.test.tsx`. Seven tests covering:
+1.Loading state shown initially
+2.Map renders after fetch resolves
+3.Error message shown when fetch fails
+4.Clicking a free cabana opens the booking form
+5.Clicking a booked cabana shows the "already booked" info
+6.Successful booking closes the modal and refetches the map
+7.Booking error keeps the modal open with the error message
+
+I decided to use mocks to avoid repeating backend tests. Mocks also let me simulate scenarios that a real backend wouldn't produce on demand, like a network error or a 401 response.
 
 ### Stage 8 — Documentation and polish
 
-<to be filled>
+Wrote README, took screenshots, reviewed AI.md, cleaned up dev-only files.
+Final smoke test with ./run.sh — booked a few cabanas, verified error paths,
+all flows work.
+
+### Reflections
+
+A few things I noticed along the way:
+
+**The AI ​​is good at syntax** Claude Code wrote clean
+boilerplate quickly, but it had no sense of "what's enough". Left unchecked
+it would add error handling, abstractions, and config options I didn't need.
+My main job was trimming — "simpler, remove that, no try/catch here, merge
+these two files".
+
+**Pre-coding discussions saved more time than the coding itself.** I spent
+maybe an hour in chat before writing any code - deciding stack, API shape,
+cabana id format, how to interpret the ambiguous "W = cabana" legend.
+Without those decisions, I would have asked the AI ​​to generate something,
+then refactor three times as I changed my mind.
+
+**The AI ​​doesn't always know when it's wrong.** Two concrete cases:
+
+- It wrote a section of CSS code for booked cabanas. I ran it, saw no effect
+  because the assets are already monochrome. The AI ​​didn't think about
+  the source image.
+- The initial run.sh used inline env vars that fail on Windows cmd.exe.
+  The AI ​​wrote platform-agnostic-looking code that wasn't.
+
+Both were caught by me reading then running the code. Review-only
+is not enough — you need to actually exercise the thing.
