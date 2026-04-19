@@ -2,12 +2,12 @@
 
 ## Tools used
 
-- **Claude Code** (VS Code extension) — main coding agent
-- **Claude (web chat)** — architecture discussions, design review, decision-making, code review
+- **Claude Code** (VS Code extension) - main coding agent
+- **Claude (web chat)** - architecture discussions, design review, decision-making, code review
 
 ## My approach
 
-Before touching code, I used Claude (web) to discuss the task itself — not as a code
+Before touching code, I used Claude (web) to discuss the task itself not as a code
 generator, but as a sounding board.
 
 I chose Node+Express+TypeScript on the backend because it's what I've been building
@@ -30,7 +30,7 @@ The initial `run.sh` used inline env var syntax
 (`MAP_PATH=$MAP_PATH BOOKINGS_PATH=$BOOKINGS_PATH npm run start ...`) which failed on
 Windows Git Bash because `concurrently` spawns commands via `cmd.exe` there, and cmd
 doesn't understand Unix-style inline env assignments. Since the vars were already
-exported earlier in the script, the inline assignment was redundant — removed it,
+exported earlier in the script, the inline assignment was redundant removed it,
 relying on `export` for cross-platform propagation to child processes.
 
 Verified end-to-end: `./run.sh` starts both backend (port 3001) and frontend (port 5173).
@@ -39,10 +39,10 @@ Verified end-to-end: `./run.sh` starts both backend (port 3001) and frontend (po
 
 Split the backend into small files:
 
-`types.ts` — Tile, Cabana, MapData types
-`services/mapLoader.ts` — parses ASCII into data, plus a helper to read the file
-`routes/map.ts` — Express router with GET /map
-`index.ts` — reads env vars, loads the map, starts the server
+`types.ts` Tile, Cabana, MapData types
+`services/mapLoader.ts` parses ASCII into data, plus a helper to read the file
+`routes/map.ts` Express router with GET /map
+`index.ts` reads env vars, loads the map, starts the server
 
 Kept the parser as a pure function so I can test it with just a string later,
 no need to touch the file system. For the router I used a factory that takes mapData as an argument. This way I
@@ -50,7 +50,7 @@ can pass fake data in tests instead of mocking file reads. Asked Claude Code to 
 endings don't mess things up. First run crashed with `ENOENT: map.ascii not found`. The path in the error
 pointed to `backend/map.ascii`, but the file is at the project root. Turns out `npm run --workspace=backend` changes the working directory into
 `backend/` before running the command. So the relative path was being resolved
-from the wrong place. Fixed it in `run.sh` — turned MAP_PATH and BOOKINGS_PATH into absolute paths
+from the wrong place. Fixed it in `run.sh` turned MAP_PATH and BOOKINGS_PATH into absolute paths
 before exporting them. After that it didn't matter where the backend started
 from.
 
@@ -71,7 +71,7 @@ and never changes. Bookings are mutable runtime state, stored in the
 booking store. When GET /api/map is called, the route merges them into
 one response. One source of truth for each kind of data.
 
-Used guard clauses — four checks in a row, each with an early return:
+Used guard clauses four checks in a row, each with an early return:
 400(Missing or wrong-type fields);
 404(Cabana not found on the map);
 401(Guest credentials don't match);
@@ -86,7 +86,7 @@ Also tested all of it with curl so successful booking returns 201 with the updat
 Before writing tests, split `index.ts` into two files:
 
 `app.ts` builds and returns the Express app
-`index.ts` — reads env vars, loads data, creates stores, calls `createApp`,
+`index.ts` reads env vars, loads data, creates stores, calls `createApp`,
 and starts listen()
 This way tests can import the app without triggering a real listen() on a port.
 
@@ -99,7 +99,7 @@ booking throws, multiple bookings coexist.
 POST /api/bookings happy path, all four error codes (400/401/404/409),
 and that GET reflects bookings after POST.
 
-For integration tests, `mapData` and `guests` are built once at the top —
+For integration tests, `mapData` and `guests` are built once at the top
 they don't change. But `bookingStore` is created fresh in `createTestApp()`
 for each test, so state doesn't leak between tests.
 
@@ -107,7 +107,28 @@ All tests pass on first run with `npm test` from the backend folder.
 
 ### Stage 4 — Frontend: render map from API
 
-<to be filled>
+Copied the `assets/` folder into `frontend/public/assets/` so Vite serves
+the images as static files. This way the frontend is self-contained and
+the backend doesn't have to serve images.
+
+Four new files:
+`types.ts` mirrors the backend response shape (Tile, Cabana, MapData), copied by hand since this is a tiny project.
+`api/client.ts` `fetchMap()` and `bookCabana()` using plain `fetch`.
+No axios or another tools, two endpoints don't need a client library.
+`components/MapTile.tsx` one 32×32 cell with a background image based
+on tile type. Empty tiles render transparent.
+`components/ResortMap.tsx` loads the map on mount, renders a CSS Grid,
+handles loading/error/empty states.
+
+The map is a rectangle of fixed-size cells. CSS Grid does exactly that with
+two lines: `gridTemplateColumns: repeat(width, 32px)` and `gridAutoRows: 32px`.
+Children render left-to-right, top-to-bottom in the order I give them.
+Canvas or SVG would be overkill for static tiles.
+
+Three separate useState flags (mapData, error, loading) instead of one
+status object. For three independent booleans it's the simpler option.
+Early returns for each state at the top of the render function keep the
+happy path clean.
 
 ### Stage 5 — Frontend: booking flow
 
