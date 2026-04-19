@@ -48,8 +48,9 @@ export default function BookingDialog({ cabana, onClose, onBooked }: Props) {
         ) : (
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', marginBottom: 4 }}>Room number</label>
+              <label htmlFor="room" style={{ display: 'block', marginBottom: 4 }}>Room number</label>
               <input
+                id="room"
                 value={room}
                 onChange={e => setRoom(e.target.value)}
                 required
@@ -57,8 +58,9 @@ export default function BookingDialog({ cabana, onClose, onBooked }: Props) {
               />
             </div>
             <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', marginBottom: 4 }}>Guest name</label>
+              <label htmlFor="guestName" style={{ display: 'block', marginBottom: 4 }}>Guest name</label>
               <input
+                id="guestName"
                 value={guestName}
                 onChange={e => setGuestName(e.target.value)}
                 required

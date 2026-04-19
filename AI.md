@@ -161,7 +161,9 @@ Also tested manually Booked a cabana - modal closed, refetched map. Clicked same
 
 ### Stage 6 — Frontend: visual distinction for booked cabanas
 
-<to be filled>
+Added conditional styling to MapTile: when `cabana.booked` is true, the tile
+gets a semi-transparent red overlay (via `boxShadow: inset`) and a red border.
+Free cabanas stay as the default monochrome drawing.
 
 ### Stage 7 — Frontend tests
 
