@@ -15,12 +15,17 @@ An interactive resort map where guests can view cabana availability and book cab
 
 ## Quick start
 
-From the project root:
+````bash
+# Clone the repository
+git clone https://github.com/senezz/resort-map.git
+cd resort-map
 
-```bash
+# Set permissions (macOS & Linux only)
+chmod +x run.sh
+
+# Install dependencies and start
 npm install
 ./run.sh
-```
 
 Opens the backend on `http://localhost:3001` and the frontend on `http://localhost:5173`.
 
@@ -32,7 +37,7 @@ Override the default map and bookings files:
 
 ```bash
 ./run.sh --map path/to/map.ascii --bookings path/to/bookings.json
-```
+````
 
 Defaults are `map.ascii` and `bookings.json` in the project root.
 
