@@ -27,6 +27,15 @@ export default function ResortMap() {
     <>
       <div
         style={{
+          display: 'inline-block',
+          padding: 16,
+          backgroundImage: 'url(/assets/parchmentBasic.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: 'cover',
+        }}
+      >
+      <div
+        style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${mapData.width}, 32px)`,
           gridAutoRows: '32px',
@@ -47,6 +56,7 @@ export default function ResortMap() {
             );
           })
         )}
+      </div>
       </div>
 
       {selectedCabana && (
