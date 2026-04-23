@@ -19,6 +19,11 @@ export function createBookingsRouter(
       return;
     }
 
+    if (cabanaId.length > 50 || room.length > 20 || guestName.length > 100) {
+      res.status(400).json({ error: 'Field too long' });
+      return;
+    }
+
     const cabana = mapData.cabanas.find(c => c.id === cabanaId);
     if (!cabana) {
       res.status(404).json({ error: 'Cabana not found' });
